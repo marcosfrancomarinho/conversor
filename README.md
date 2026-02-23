@@ -20,5 +20,5 @@ Converta imagens entre **PNG**, **JPEG** ou combine várias em um único **PDF**
 
 1. Execute o script:  
 ```bash
-python conversor_imagens.py
+pip install -r requirements.txt
 python conversor_imagens.py
