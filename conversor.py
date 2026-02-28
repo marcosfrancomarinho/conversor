@@ -107,18 +107,26 @@ class ConversorImagensApp:
             self.lista_arquivos.insert(tk.END, os.path.basename(file))
 
     def escolher_pasta_saida(self):
+        if self.formato_var.get() == "PDF":
+            return filedialog.asksaveasfilename(
+            title="Salvar PDF como",
+            defaultextension=".pdf",
+            filetypes=[("Arquivo PDF", "*.pdf")],
+        )
         return filedialog.askdirectory(title="Escolha a pasta de destino")
 
     def converter_selecionados(self):
+        formato = self.formato_var.get()
+        
         if not self.arquivos_selecionados:
             messagebox.showwarning("Aviso", "Nenhum arquivo selecionado!")
             return
-
+    
         pasta_saida = self.escolher_pasta_saida()
+            
         if not pasta_saida:
             return
 
-        formato = self.formato_var.get()
 
         self.progresso["maximum"] = len(self.arquivos_selecionados)
         self.progresso["value"] = 0
@@ -136,12 +144,12 @@ class ConversorImagensApp:
                         nome_base = f"arquivo_{i+1}"
 
                     if formato == "PNG":
-                        destino = os.path.join(pasta_saida, f"nome_base_{i+1}" + ".png")
+                        destino = os.path.join(pasta_saida, f"{nome_base}_{i+1}" + ".png")
                         img.convert("RGBA").save(destino, format="PNG")
                         convertidos += 1
 
                     elif formato == "JPEG":
-                        destino = os.path.join(pasta_saida, f"nome_base_{i+1}" + ".jpg")
+                        destino = os.path.join(pasta_saida, f"{nome_base}_{i+1}" + ".jpg")
                         img.convert("RGB").save(destino, format="JPEG")
                         convertidos += 1
 
@@ -165,18 +173,8 @@ class ConversorImagensApp:
         messagebox.showinfo("Concluído", f"{convertidos} arquivos processados!")
 
     def _salvar_pdf(self, imagens: list[Image.Image], pasta_saida: str):
-        nome_pdf = filedialog.asksaveasfilename(
-            title="Salvar PDF como",
-            defaultextension=".pdf",
-            filetypes=[("Arquivo PDF", "*.pdf")],
-            initialdir=pasta_saida
-        )
-
-        if not nome_pdf:
-            return
-
         imagens[0].save(
-            nome_pdf,
+            pasta_saida,
             save_all=True,
             append_images=imagens[1:]
         )
