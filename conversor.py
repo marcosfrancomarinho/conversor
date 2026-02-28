@@ -136,12 +136,12 @@ class ConversorImagensApp:
                         nome_base = f"arquivo_{i+1}"
 
                     if formato == "PNG":
-                        destino = os.path.join(pasta_saida, nome_base + ".png")
+                        destino = os.path.join(pasta_saida, f"nome_base_{i+1}" + ".png")
                         img.convert("RGBA").save(destino, format="PNG")
                         convertidos += 1
 
                     elif formato == "JPEG":
-                        destino = os.path.join(pasta_saida, nome_base + ".jpg")
+                        destino = os.path.join(pasta_saida, f"nome_base_{i+1}" + ".jpg")
                         img.convert("RGB").save(destino, format="JPEG")
                         convertidos += 1
 
