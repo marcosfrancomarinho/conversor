@@ -10,73 +10,76 @@ from src.infrastrucure.tk_pdf_converter import TkPDFConverter
 import tkinter as tk
 import os
 
-class ConversorImagensApp:
 
-    def __init__(self, root: Tk, file_selector_usecase:FileSelectorUseCase, file_converter_usecase:FileConverterUseCase):
+class ImageConverterApp:
+
+    def __init__(self, root: Tk, file_selector_usecase: FileSelectorUseCase, file_converter_usecase: FileConverterUseCase):
         self.__root = root
         self.__file_selector_usecase = file_selector_usecase
         self.__file_converter_usecase = file_converter_usecase
         self.__list_file: Listbox
         self.__progress: ttk.Progressbar
         self.__format_var: StringVar = tk.StringVar(value="PNG")
-        self.__selected_file:list[SelectorOutputFile] = []
-        self.__criar_interface()
+        self.__selected_file: list[SelectorOutputFile] = []
+        self.__create_interface()
 
     # ================= UI =================
-    def __criar_interface(self):
+    def __create_interface(self):
         self.__root.title("Conversor de Imagens")
         self.__root.geometry("520x500")
         self.__root.minsize(520, 500)
+
         style = ttk.Style()
         style.theme_use("clam")
         style.configure("TButton", padding=6, font=("Segoe UI", 10))
         style.configure("TRadiobutton", font=("Segoe UI", 10))
         style.configure("TLabelFrame", font=("Segoe UI", 10, "bold"))
         style.configure("TProgressbar", thickness=12)
+
         container = ttk.Frame(self.__root, padding=15)
         container.pack(fill="both", expand=True)
 
         ttk.Button(
             container,
             text="Selecionar Arquivos",
-            command=self.selecionar_arquivos
+            command=self.select_files
         ).pack(fill="x", pady=(0, 10))
 
-        frame_lista = ttk.Frame(container)
-        frame_lista.pack(fill="both", expand=True)
+        frame_list = ttk.Frame(container)
+        frame_list.pack(fill="both", expand=True)
 
         self.__list_file = tk.Listbox(
-            frame_lista,
+            frame_list,
             height=10,
             selectmode=tk.EXTENDED,
             exportselection=False
         )
         self.__list_file.pack(side="left", fill="both", expand=True)
 
-        scrollbar = ttk.Scrollbar(frame_lista, command=self.__list_file.yview) # type: ignore
+        scrollbar = ttk.Scrollbar(frame_list, command=self.__list_file.yview)  # type: ignore
         scrollbar.pack(side="right", fill="y")
         self.__list_file.config(yscrollcommand=scrollbar.set)
 
-        frame_formato = ttk.LabelFrame(container, text="Formato de Conversão", padding=10)
-        frame_formato.pack(fill="x", pady=10)
+        frame_format = ttk.LabelFrame(container, text="Formato de Conversão", padding=10)
+        frame_format.pack(fill="x", pady=10)
 
-        ttk.Radiobutton(frame_formato, text="PNG", variable=self.__format_var, value="PNG").pack(side="left", padx=10)
-        ttk.Radiobutton(frame_formato, text="JPEG", variable=self.__format_var, value="JPEG").pack(side="left", padx=10)
-        ttk.Radiobutton(frame_formato, text="PDF (único arquivo)", variable=self.__format_var, value="PDF").pack(side="left", padx=10)
+        ttk.Radiobutton(frame_format, text="PNG", variable=self.__format_var, value="PNG").pack(side="left", padx=10)
+        ttk.Radiobutton(frame_format, text="JPEG", variable=self.__format_var, value="JPEG").pack(side="left", padx=10)
+        ttk.Radiobutton(frame_format, text="PDF (arquivo único)", variable=self.__format_var, value="PDF").pack(side="left", padx=10)
 
-        frame_botoes = ttk.Frame(container)
-        frame_botoes.pack(fill="x", pady=5)
+        frame_buttons = ttk.Frame(container)
+        frame_buttons.pack(fill="x", pady=5)
 
         ttk.Button(
-            frame_botoes,
+            frame_buttons,
             text="Converter",
-            command=self.converter_selecionados
+            command=self.convert_selected
         ).pack(side="left", expand=True, fill="x", padx=(0, 5))
 
         ttk.Button(
-            frame_botoes,
+            frame_buttons,
             text="Remover Selecionado",
-            command=self.remover_selecionados
+            command=self.remove_selected
         ).pack(side="left", expand=True, fill="x", padx=(5, 0))
 
         self.__progress = ttk.Progressbar(
@@ -86,42 +89,47 @@ class ConversorImagensApp:
         )
         self.__progress.pack(fill="x", pady=10)
 
-    # ================= Ações =================
+    # ================= Actions =================
 
-    def remover_selecionados(self):
-        selecionados= list(self.__list_file.curselection()) # type: ignore
-        if not selecionados:
+    def remove_selected(self):
+        selected = list(self.__list_file.curselection())  # type: ignore
+        if not selected:
             return
-        for index in reversed(selecionados): # type: ignore
-            self.__list_file.delete(index) # type: ignore
+        for index in reversed(selected):  # type: ignore
+            self.__list_file.delete(index)  # type: ignore
             del self.__selected_file[index]
 
-    def selecionar_arquivos(self):
+    def select_files(self):
         self.__selected_file.extend(self.__file_selector_usecase.select())
         self.__list_file.delete(0, tk.END)
         for file in self.__selected_file:
             self.__list_file.insert(tk.END, os.path.basename(file.path))
 
-    def converter_selecionados(self):
+    def convert_selected(self):
         try:
             format = self.__format_var.get()
             self.__progress["maximum"] = len(self.__selected_file)
             self.__progress["value"] = 0
+
             if not self.__selected_file:
                 messagebox.showwarning("Aviso", "Nenhum arquivo selecionado!")
                 return
-            input = ConverterInputFile(format, self.__selected_file, self.__update_progress_bar )
-            output = self.__file_converter_usecase.converter(input)   
+
+            input_data = ConverterInputFile(format, self.__selected_file, self.__update_progress_bar)
+            output = self.__file_converter_usecase.converter(input_data)
+
         except Exception as e:
-                messagebox.showerror(title="Aviso", message=f"Error: {e}")
-                return
+            messagebox.showerror("Erro", f"Erro: {e}")
+            return
+
         messagebox.showinfo("Concluído", f"{output.quantity} arquivos processados!")
 
-    def __update_progress_bar(self,course:int)->None:
-        self.__progress["value"] =  course
+    def __update_progress_bar(self, course: int) -> None:
+        self.__progress["value"] = course
         self.__root.update_idletasks()
-           
-# ================= EXECUÇÃO =================
+
+
+# ================= EXECUTION =================
 
 if __name__ == "__main__":
     root = tk.Tk()
@@ -131,5 +139,5 @@ if __name__ == "__main__":
     file_save_location_selector = TKFileSaveLocationSelector()
     file_selector_usecase = FileSelectorUseCase(file_selector)
     file_converter_usecase = FileConverterUseCase(image_converter, pdf_converter, file_save_location_selector)
-    ConversorImagensApp(root, file_selector_usecase, file_converter_usecase)
+    ImageConverterApp(root, file_selector_usecase, file_converter_usecase)
     root.mainloop()
