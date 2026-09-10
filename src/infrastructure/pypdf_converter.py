@@ -2,7 +2,7 @@ import os
 from collections.abc import Callable
 from io import BytesIO
 
-from PIL import Image, ImageSequence, UnidentifiedImageError
+from PIL import Image, ImageOps, ImageSequence, UnidentifiedImageError
 from pypdf import PdfReader, PdfWriter
 
 from src.domain.entities.file import File
@@ -74,10 +74,12 @@ class PyPDFConverter(PDFConverter):
         try:
             with Image.open(path) as image:
                 frames = [
-                    PyPDFConverter.__to_rgb(frame.copy())
+                    PyPDFConverter.__to_rgb(
+                        ImageOps.exif_transpose(frame.copy())
+                    )
                     for frame in ImageSequence.Iterator(image)
                 ]
-        except UnidentifiedImageError as error:
+        except (UnidentifiedImageError, OSError) as error:
             raise ValueError(
                 f"Formato de arquivo não suportado: {path}"
             ) from error
@@ -91,6 +93,7 @@ class PyPDFConverter(PDFConverter):
             format="PDF",
             save_all=True,
             append_images=frames[1:],
+            resolution=150.0,
         )
         buffer.seek(0)
         return buffer
