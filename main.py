@@ -1,4 +1,6 @@
+import sys
 import tkinter as tk
+from pathlib import Path
 
 from src.application.usecase.file_converter_usecase import FileConverterUseCase
 from src.application.usecase.file_selector_usecase import FileSelectorUseCase
@@ -9,8 +11,18 @@ from src.infrastructure.tk_file_selector import TkFileSelector
 from src.presentation.tk_app import ConverterApp
 
 
+def resource_path(filename: str) -> str:
+    base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
+    return str(base_path / filename)
+
+
 def main() -> None:
     root = tk.Tk()
+
+    try:
+        root.iconbitmap(resource_path("icone.ico"))
+    except tk.TclError:
+        pass
 
     file_selector = TkFileSelector()
     save_location_selector = TkFileSaveLocationSelector()
