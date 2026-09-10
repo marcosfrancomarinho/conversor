@@ -1,87 +1,186 @@
-<h1 align="center">🖼️ Conversor de Imagens</h1>
+<h1 align="center">📄 Conversor PDF & Imagens</h1>
 
 <p align="center">
-  Aplicação desktop para converter imagens e gerar arquivos PDF de forma simples e rápida.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/Tkinter-GUI-2C5E8A?style=flat-square" alt="Tkinter">
-  <img src="https://img.shields.io/badge/Pillow-12-8A2BE2?style=flat-square" alt="Pillow">
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/licença-MIT-green?style=flat-square" alt="Licença MIT">
-  </a>
+  Aplicação desktop em Python para converter imagens e combinar imagens + PDFs em um único documento.
 </p>
 
 ## Sobre o projeto
 
-O **Conversor de Imagens** é uma aplicação desktop desenvolvida em Python que permite selecionar vários arquivos e convertê-los para **PNG** ou **JPEG**. Também é possível reunir todas as imagens selecionadas em um único arquivo **PDF**.
+O **Conversor PDF & Imagens** foi pensado para deixar conversões do dia a dia rápidas, principalmente quando vários documentos precisam virar um único PDF.
 
-A interface foi construída com Tkinter e oferece seleção múltipla, remoção de itens, escolha do destino e acompanhamento do processamento por uma barra de progresso.
+O fluxo evita etapas desnecessárias: você adiciona os documentos, confere a ordem e o local de saída e clica em **Converter**. O destino é sugerido automaticamente e só precisa ser alterado quando você quiser.
 
 ## Funcionalidades
 
-- Seleção de múltiplas imagens;
-- visualização dos arquivos selecionados;
-- remoção individual ou múltipla da lista;
-- conversão em lote para PNG;
-- conversão em lote para JPEG;
-- união das imagens em um único PDF;
-- escolha da pasta ou arquivo de destino;
-- barra de progresso;
-- mensagens de validação, erro e conclusão.
+- seleção múltipla de imagens e PDFs;
+- suporte a imagens com extensões não convencionais, como `.001`, `.002`, `.010` etc., desde que o conteúdo seja uma imagem válida reconhecida pelo Pillow;
+- janela aberta maximizada para manter as ações principais visíveis;
+- tabela com ordem, nome, tipo e tamanho dos arquivos;
+- prevenção de arquivos duplicados;
+- reordenação com **Subir** e **Descer**;
+- remoção individual/múltipla e limpeza da lista;
+- conversão de imagens para PNG ou JPEG;
+- geração de **um único PDF** misturando imagens e PDFs;
+- preservação de todas as páginas dos PDFs existentes;
+- suporte a imagens multipágina, como TIFF, quando a saída é PDF;
+- correção automática da orientação EXIF de imagens;
+- destino automático exibido antes da conversão;
+- botão **Alterar...** para escolher outro destino;
+- botão **Usar automático** para voltar ao caminho sugerido;
+- prevenção de sobrescrita acidental;
+- proteção para impedir que o PDF final substitua um PDF usado como entrada;
+- botão para abrir a pasta de destino;
+- botão para abrir o resultado após a conversão;
+- barra de progresso e status da operação;
+- bloqueio dos controles durante a conversão para evitar clique duplo;
+- validação visual quando PDFs são usados com saída PNG/JPEG;
+- nomes previsíveis para arquivos convertidos;
+- JPEG salvo com qualidade alta e PNG otimizado.
+
+## Arquivos com extensão numérica
+
+Alguns sistemas salvam imagens com nomes como:
+
+```text
+foto.001
+foto.002
+pagina.010
+```
+
+O conversor não depende da extensão para abrir esses arquivos como imagem. Eles podem ser selecionados normalmente e o Pillow identifica o formato pelo conteúdo real do arquivo.
+
+Assim, uma imagem JPEG chamada `foto.002`, por exemplo, pode ser convertida para PNG, JPEG ou incluída em um PDF normalmente.
+
+## Fluxo de uso
+
+1. Clique em **Adicionar arquivos**.
+2. Confira a ordem dos documentos.
+3. Escolha **PDF único**, **PNG** ou **JPEG**.
+4. Confira o destino mostrado na interface.
+5. Clique em **Converter**.
+
+Para PDF, não é necessário escolher pasta e nome a cada conversão.
+
+### Destino automático
+
+Para **PDF**, o resultado é sugerido na mesma pasta do primeiro documento:
+
+```text
+contrato.pdf
+→ contrato_convertido.pdf
+```
+
+Se o arquivo já existir:
+
+```text
+contrato_convertido_2.pdf
+contrato_convertido_3.pdf
+...
+```
+
+Para **PNG/JPEG**, os resultados são enviados para uma pasta:
+
+```text
+convertidos/
+```
+
+## PDF com imagens e PDFs misturados
+
+A ordem exibida na tabela é a ordem usada no documento final.
+
+```text
+1. capa.jpg
+2. contrato.pdf
+3. comprovante.001
+4. anexos.pdf
+```
+
+O PDF final terá:
+
+```text
+capa.jpg
++ todas as páginas de contrato.pdf
++ comprovante.001 (se o conteúdo for uma imagem válida)
++ todas as páginas de anexos.pdf
+```
+
+Os PDFs existentes são combinados com `pypdf`, sem transformar suas páginas em imagens.
+
+## Atalhos
+
+| Atalho | Ação |
+|---|---|
+| `Ctrl + O` | Adicionar arquivos |
+| `Delete` | Remover selecionados |
+| `Ctrl + ↑` | Subir selecionados |
+| `Ctrl + ↓` | Descer selecionados |
+| `Ctrl + Enter` | Converter |
 
 ## Tecnologias
 
-- **Python** — linguagem principal;
-- **Tkinter/ttk** — interface gráfica;
-- **Pillow** — leitura e conversão de imagens;
-- **PyInstaller** — geração de executável;
-- **Docker** — configuração alternativa do ambiente.
+- **Python 3.11+**
+- **Tkinter/ttk** — interface gráfica
+- **Pillow** — processamento e identificação de imagens
+- **pypdf** — leitura, união e escrita de PDFs
+- **PyInstaller** — geração de executável
+- **unittest** — testes automatizados
+- **GitHub Actions** — execução automática dos testes
 
 ## Arquitetura
-
-O código separa as regras da aplicação dos detalhes da interface e do sistema de arquivos:
 
 ```text
 conversor/
 ├── main.py
 ├── requirements.txt
-├── icone.ico
+├── tests/
+│   ├── test_file.py
+│   ├── test_image_converter.py
+│   └── test_pdf_converter.py
 └── src/
-    ├── application/      # DTOs e casos de uso
-    ├── domain/           # Contratos e regras centrais
-    └── infrastrucure/    # Tkinter, seleção e conversão de arquivos
+    ├── application/
+    │   ├── dto/
+    │   └── usecase/
+    ├── domain/
+    │   ├── entities/
+    │   ├── gateway/
+    │   └── valuesobject/
+    ├── infrastructure/
+    │   ├── pillow_image_converter.py
+    │   ├── pypdf_converter.py
+    │   ├── tk_file_selector.py
+    │   └── tk_file_save_location_selector.py
+    └── presentation/
+        ├── theme.py
+        └── tk_app.py
 ```
 
-Essa divisão facilita manutenção, testes e substituição das implementações externas.
+Responsabilidades:
 
-## Pré-requisitos
-
-- Python 3.11 ou superior;
-- suporte ao Tkinter no sistema operacional.
-
-No Ubuntu e derivados, instale o Tkinter caso ainda não esteja disponível:
-
-```bash
-sudo apt update
-sudo apt install python3-tk
-```
+- `domain`: regras e contratos centrais;
+- `application`: casos de uso e DTOs;
+- `infrastructure`: Pillow, pypdf, sistema de arquivos e diálogos Tkinter;
+- `presentation`: interface e tema visual;
+- `main.py`: composition root e inicialização da aplicação.
 
 ## Instalação
-
-Clone o repositório:
 
 ```bash
 git clone https://github.com/marcosfrancomarinho/conversor.git
 cd conversor
+
+python -m venv .venv
 ```
 
-Crie e ative um ambiente virtual:
+Linux/macOS:
 
 ```bash
-python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Windows:
+
+```powershell
+.venv\Scripts\activate
 ```
 
 Instale as dependências:
@@ -90,35 +189,38 @@ Instale as dependências:
 python -m pip install -r requirements.txt
 ```
 
-## Execução
+No Ubuntu/Lubuntu, caso necessário:
 
-Com o ambiente virtual ativado:
+```bash
+sudo apt update
+sudo apt install python3-tk
+```
+
+## Execução
 
 ```bash
 python main.py
 ```
 
-Na aplicação:
+## Testes
 
-1. Clique em **Selecionar Arquivos**;
-2. escolha uma ou mais imagens;
-3. selecione PNG, JPEG ou PDF;
-4. clique em **Converter**;
-5. escolha o destino dos arquivos.
+```bash
+python -m unittest discover -s tests -v
+```
 
-## Gerando um executável
+Os testes também são executados automaticamente no GitHub Actions para Python 3.11, 3.12 e 3.13.
 
-O projeto inclui PyInstaller nas dependências. Para gerar uma versão distribuível:
+## Gerando executável
 
 ```bash
 pyinstaller --onefile --windowed --icon=icone.ico main.py
 ```
 
-O arquivo gerado ficará no diretório `dist/`. O executável deve ser criado no mesmo sistema operacional em que será utilizado.
+O executável é criado em `dist/`.
 
 ## Licença
 
-Distribuído sob a licença MIT. Consulte [LICENSE](./LICENSE).
+MIT. Consulte [LICENSE](./LICENSE).
 
 ## Autor
 
