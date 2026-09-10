@@ -1,46 +1,76 @@
-<h1 align="center">📄 Conversor de Arquivos</h1>
+<h1 align="center">📄 Conversor PDF & Imagens</h1>
 
 <p align="center">
-  Aplicação desktop para converter imagens e combinar imagens + PDFs em um único PDF.
+  Aplicação desktop em Python para converter imagens e combinar imagens + PDFs em um único documento.
 </p>
 
 ## Sobre o projeto
 
-O **Conversor de Arquivos** é uma aplicação desktop em Python/Tkinter para conversão em lote de imagens e geração de PDF.
+O **Conversor PDF & Imagens** foi pensado para deixar conversões do dia a dia rápidas, principalmente quando vários documentos precisam virar um único PDF.
 
-O fluxo foi pensado para reduzir cliques: ao selecionar os arquivos, a aplicação já sugere e mostra o destino. Ao clicar em **Converter**, o arquivo é salvo diretamente nesse local. O botão **Alterar...** fica disponível apenas quando você realmente quiser escolher outro destino.
+O fluxo evita etapas desnecessárias: você adiciona os documentos, confere a ordem e o local de saída e clica em **Converter**. O destino é sugerido automaticamente e só precisa ser alterado quando você quiser.
 
 ## Funcionalidades
 
 - seleção múltipla de imagens e PDFs;
-- remoção e limpeza da lista;
-- prevenção de arquivos duplicados na seleção;
-- alteração da ordem dos arquivos com **↑** e **↓**;
+- tabela com ordem, nome, tipo e tamanho dos arquivos;
+- prevenção de arquivos duplicados;
+- reordenação com **Subir** e **Descer**;
+- remoção individual/múltipla e limpeza da lista;
 - conversão de imagens para PNG ou JPEG;
 - geração de **um único PDF** misturando imagens e PDFs;
 - preservação de todas as páginas dos PDFs existentes;
-- suporte a imagens com múltiplos frames, como TIFF;
+- suporte a imagens multipágina, como TIFF, quando a saída é PDF;
+- correção automática da orientação EXIF de imagens;
 - destino automático exibido antes da conversão;
-- alteração opcional do destino;
-- nomes de saída previsíveis, sem números aleatórios;
-- prevenção de sobrescrita nos arquivos PNG/JPEG;
-- botão para abrir rapidamente a pasta de destino;
-- barra de progresso e mensagens de erro mais claras.
+- botão **Alterar...** para escolher outro destino;
+- botão **Usar automático** para voltar ao caminho sugerido;
+- prevenção de sobrescrita acidental;
+- proteção para impedir que o PDF final substitua um PDF usado como entrada;
+- botão para abrir a pasta de destino;
+- botão para abrir o resultado após a conversão;
+- barra de progresso e status da operação;
+- bloqueio dos controles durante a conversão para evitar clique duplo;
+- validação visual quando PDFs são usados com saída PNG/JPEG;
+- nomes previsíveis para arquivos convertidos;
+- JPEG salvo com qualidade alta e PNG otimizado.
 
-## Como funciona o destino automático
+## Fluxo de uso
 
-Depois que os arquivos são selecionados:
+1. Clique em **Adicionar arquivos**.
+2. Confira a ordem dos documentos.
+3. Escolha **PDF único**, **PNG** ou **JPEG**.
+4. Confira o destino mostrado na interface.
+5. Clique em **Converter**.
 
-- para **PDF**, o resultado é salvo na mesma pasta do primeiro arquivo, com o nome `<primeiro-arquivo>_convertido.pdf`;
-- para **PNG/JPEG**, os resultados vão para uma pasta `convertidos` ao lado do primeiro arquivo.
+Para PDF, não é necessário escolher pasta e nome a cada conversão.
 
-O destino aparece na interface e pode ser alterado com o botão **Alterar...**.
+### Destino automático
+
+Para **PDF**, o resultado é sugerido na mesma pasta do primeiro documento:
+
+```text
+contrato.pdf
+→ contrato_convertido.pdf
+```
+
+Se o arquivo já existir:
+
+```text
+contrato_convertido_2.pdf
+contrato_convertido_3.pdf
+...
+```
+
+Para **PNG/JPEG**, os resultados são enviados para uma pasta:
+
+```text
+convertidos/
+```
 
 ## PDF com imagens e PDFs misturados
 
-Ao escolher **PDF único**, a ordem mostrada na lista é a ordem usada no documento final.
-
-Exemplo:
+A ordem exibida na tabela é a ordem usada no documento final.
 
 ```text
 1. capa.jpg
@@ -49,22 +79,46 @@ Exemplo:
 4. anexos.pdf
 ```
 
-O resultado será um único PDF contendo a imagem `capa.jpg`, todas as páginas de `contrato.pdf`, a imagem `comprovante.png` e todas as páginas de `anexos.pdf`, nessa ordem.
+O PDF final terá:
+
+```text
+capa.jpg
++ todas as páginas de contrato.pdf
++ comprovante.png
++ todas as páginas de anexos.pdf
+```
+
+Os PDFs existentes são combinados com `pypdf`, sem transformar suas páginas em imagens.
+
+## Atalhos
+
+| Atalho | Ação |
+|---|---|
+| `Ctrl + O` | Adicionar arquivos |
+| `Delete` | Remover selecionados |
+| `Ctrl + ↑` | Subir selecionados |
+| `Ctrl + ↓` | Descer selecionados |
+| `Ctrl + Enter` | Converter |
 
 ## Tecnologias
 
 - **Python 3.11+**
-- **Tkinter/ttk** — interface gráfica;
-- **Pillow** — processamento de imagens;
-- **pypdf** — leitura, união e escrita de PDFs;
-- **PyInstaller** — geração de executável.
+- **Tkinter/ttk** — interface gráfica
+- **Pillow** — processamento de imagens
+- **pypdf** — leitura, união e escrita de PDFs
+- **PyInstaller** — geração de executável
+- **unittest** — testes automatizados
+- **GitHub Actions** — execução automática dos testes
 
 ## Arquitetura
 
 ```text
 conversor/
-├── main.py                     # composition root
+├── main.py
 ├── requirements.txt
+├── tests/
+│   ├── test_file.py
+│   └── test_pdf_converter.py
 └── src/
     ├── application/
     │   ├── dto/
@@ -79,10 +133,17 @@ conversor/
     │   ├── tk_file_selector.py
     │   └── tk_file_save_location_selector.py
     └── presentation/
+        ├── theme.py
         └── tk_app.py
 ```
 
-A interface ficou em `presentation`, os adaptadores externos em `infrastructure`, as regras de aplicação em `application` e os contratos/regras centrais em `domain`.
+Responsabilidades:
+
+- `domain`: regras e contratos centrais;
+- `application`: casos de uso e DTOs;
+- `infrastructure`: Pillow, pypdf, sistema de arquivos e diálogos Tkinter;
+- `presentation`: interface e tema visual;
+- `main.py`: composition root e inicialização da aplicação.
 
 ## Instalação
 
@@ -123,6 +184,14 @@ sudo apt install python3-tk
 ```bash
 python main.py
 ```
+
+## Testes
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Os testes também são executados automaticamente no GitHub Actions para Python 3.11, 3.12 e 3.13.
 
 ## Gerando executável
 
