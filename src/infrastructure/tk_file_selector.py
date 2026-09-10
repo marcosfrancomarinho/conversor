@@ -11,11 +11,13 @@ class TkFileSelector(FileSelector):
             filetypes=[
                 (
                     "Arquivos suportados",
-                    "*.pdf *.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff",
+                    "*.pdf *.png *.jpg *.jpeg *.webp *.bmp *.gif *.tif *.tiff",
                 ),
                 ("PDF", "*.pdf"),
-                ("Imagens", "*.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff"),
-                ("Todos os arquivos", "*.*"),
+                (
+                    "Imagens",
+                    "*.png *.jpg *.jpeg *.webp *.bmp *.gif *.tif *.tiff",
+                ),
             ],
         )
         return [Path(file) for file in files]
