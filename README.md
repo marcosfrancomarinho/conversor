@@ -1,87 +1,108 @@
-<h1 align="center">🖼️ Conversor de Imagens</h1>
+<h1 align="center">📄 Conversor de Arquivos</h1>
 
 <p align="center">
-  Aplicação desktop para converter imagens e gerar arquivos PDF de forma simples e rápida.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/Tkinter-GUI-2C5E8A?style=flat-square" alt="Tkinter">
-  <img src="https://img.shields.io/badge/Pillow-12-8A2BE2?style=flat-square" alt="Pillow">
-  <a href="./LICENSE">
-    <img src="https://img.shields.io/badge/licença-MIT-green?style=flat-square" alt="Licença MIT">
-  </a>
+  Aplicação desktop para converter imagens e combinar imagens + PDFs em um único PDF.
 </p>
 
 ## Sobre o projeto
 
-O **Conversor de Imagens** é uma aplicação desktop desenvolvida em Python que permite selecionar vários arquivos e convertê-los para **PNG** ou **JPEG**. Também é possível reunir todas as imagens selecionadas em um único arquivo **PDF**.
+O **Conversor de Arquivos** é uma aplicação desktop em Python/Tkinter para conversão em lote de imagens e geração de PDF.
 
-A interface foi construída com Tkinter e oferece seleção múltipla, remoção de itens, escolha do destino e acompanhamento do processamento por uma barra de progresso.
+O fluxo foi pensado para reduzir cliques: ao selecionar os arquivos, a aplicação já sugere e mostra o destino. Ao clicar em **Converter**, o arquivo é salvo diretamente nesse local. O botão **Alterar...** fica disponível apenas quando você realmente quiser escolher outro destino.
 
 ## Funcionalidades
 
-- Seleção de múltiplas imagens;
-- visualização dos arquivos selecionados;
-- remoção individual ou múltipla da lista;
-- conversão em lote para PNG;
-- conversão em lote para JPEG;
-- união das imagens em um único PDF;
-- escolha da pasta ou arquivo de destino;
-- barra de progresso;
-- mensagens de validação, erro e conclusão.
+- seleção múltipla de imagens e PDFs;
+- remoção e limpeza da lista;
+- prevenção de arquivos duplicados na seleção;
+- alteração da ordem dos arquivos com **↑** e **↓**;
+- conversão de imagens para PNG ou JPEG;
+- geração de **um único PDF** misturando imagens e PDFs;
+- preservação de todas as páginas dos PDFs existentes;
+- suporte a imagens com múltiplos frames, como TIFF;
+- destino automático exibido antes da conversão;
+- alteração opcional do destino;
+- nomes de saída previsíveis, sem números aleatórios;
+- prevenção de sobrescrita nos arquivos PNG/JPEG;
+- botão para abrir rapidamente a pasta de destino;
+- barra de progresso e mensagens de erro mais claras.
+
+## Como funciona o destino automático
+
+Depois que os arquivos são selecionados:
+
+- para **PDF**, o resultado é salvo na mesma pasta do primeiro arquivo, com o nome `<primeiro-arquivo>_convertido.pdf`;
+- para **PNG/JPEG**, os resultados vão para uma pasta `convertidos` ao lado do primeiro arquivo.
+
+O destino aparece na interface e pode ser alterado com o botão **Alterar...**.
+
+## PDF com imagens e PDFs misturados
+
+Ao escolher **PDF único**, a ordem mostrada na lista é a ordem usada no documento final.
+
+Exemplo:
+
+```text
+1. capa.jpg
+2. contrato.pdf
+3. comprovante.png
+4. anexos.pdf
+```
+
+O resultado será um único PDF contendo a imagem `capa.jpg`, todas as páginas de `contrato.pdf`, a imagem `comprovante.png` e todas as páginas de `anexos.pdf`, nessa ordem.
 
 ## Tecnologias
 
-- **Python** — linguagem principal;
+- **Python 3.11+**
 - **Tkinter/ttk** — interface gráfica;
-- **Pillow** — leitura e conversão de imagens;
-- **PyInstaller** — geração de executável;
-- **Docker** — configuração alternativa do ambiente.
+- **Pillow** — processamento de imagens;
+- **pypdf** — leitura, união e escrita de PDFs;
+- **PyInstaller** — geração de executável.
 
 ## Arquitetura
 
-O código separa as regras da aplicação dos detalhes da interface e do sistema de arquivos:
-
 ```text
 conversor/
-├── main.py
+├── main.py                     # composition root
 ├── requirements.txt
-├── icone.ico
 └── src/
-    ├── application/      # DTOs e casos de uso
-    ├── domain/           # Contratos e regras centrais
-    └── infrastrucure/    # Tkinter, seleção e conversão de arquivos
+    ├── application/
+    │   ├── dto/
+    │   └── usecase/
+    ├── domain/
+    │   ├── entities/
+    │   ├── gateway/
+    │   └── valuesobject/
+    ├── infrastructure/
+    │   ├── pillow_image_converter.py
+    │   ├── pypdf_converter.py
+    │   ├── tk_file_selector.py
+    │   └── tk_file_save_location_selector.py
+    └── presentation/
+        └── tk_app.py
 ```
 
-Essa divisão facilita manutenção, testes e substituição das implementações externas.
-
-## Pré-requisitos
-
-- Python 3.11 ou superior;
-- suporte ao Tkinter no sistema operacional.
-
-No Ubuntu e derivados, instale o Tkinter caso ainda não esteja disponível:
-
-```bash
-sudo apt update
-sudo apt install python3-tk
-```
+A interface ficou em `presentation`, os adaptadores externos em `infrastructure`, as regras de aplicação em `application` e os contratos/regras centrais em `domain`.
 
 ## Instalação
-
-Clone o repositório:
 
 ```bash
 git clone https://github.com/marcosfrancomarinho/conversor.git
 cd conversor
+
+python -m venv .venv
 ```
 
-Crie e ative um ambiente virtual:
+Linux/macOS:
 
 ```bash
-python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Windows:
+
+```powershell
+.venv\Scripts\activate
 ```
 
 Instale as dependências:
@@ -90,35 +111,30 @@ Instale as dependências:
 python -m pip install -r requirements.txt
 ```
 
-## Execução
+No Ubuntu/Lubuntu, caso necessário:
 
-Com o ambiente virtual ativado:
+```bash
+sudo apt update
+sudo apt install python3-tk
+```
+
+## Execução
 
 ```bash
 python main.py
 ```
 
-Na aplicação:
-
-1. Clique em **Selecionar Arquivos**;
-2. escolha uma ou mais imagens;
-3. selecione PNG, JPEG ou PDF;
-4. clique em **Converter**;
-5. escolha o destino dos arquivos.
-
-## Gerando um executável
-
-O projeto inclui PyInstaller nas dependências. Para gerar uma versão distribuível:
+## Gerando executável
 
 ```bash
 pyinstaller --onefile --windowed --icon=icone.ico main.py
 ```
 
-O arquivo gerado ficará no diretório `dist/`. O executável deve ser criado no mesmo sistema operacional em que será utilizado.
+O executável é criado em `dist/`.
 
 ## Licença
 
-Distribuído sob a licença MIT. Consulte [LICENSE](./LICENSE).
+MIT. Consulte [LICENSE](./LICENSE).
 
 ## Autor
 
