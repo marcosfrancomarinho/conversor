@@ -16,6 +16,28 @@ def resource_path(filename: str) -> str:
     return str(base_path / filename)
 
 
+def maximize_window(root: tk.Tk) -> None:
+    """Abre a aplicação maximizada, com fallback para quase toda a tela."""
+    root.update_idletasks()
+
+    try:
+        if sys.platform.startswith("win"):
+            root.state("zoomed")
+            return
+
+        if sys.platform != "darwin":
+            root.attributes("-zoomed", True)
+            return
+    except tk.TclError:
+        pass
+
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    width = max(760, screen_width - 40)
+    height = max(620, screen_height - 80)
+    root.geometry(f"{width}x{height}+0+0")
+
+
 def main() -> None:
     root = tk.Tk()
 
@@ -41,6 +63,8 @@ def main() -> None:
         file_converter_usecase=file_converter_usecase,
         save_location_selector=save_location_selector,
     )
+
+    root.after_idle(lambda: maximize_window(root))
     root.mainloop()
 
 
