@@ -13,6 +13,8 @@ O fluxo evita etapas desnecessárias: você adiciona os documentos, confere a or
 ## Funcionalidades
 
 - seleção múltipla de imagens e PDFs;
+- suporte a imagens com extensões não convencionais, como `.001`, `.002`, `.010` etc., desde que o conteúdo seja uma imagem válida reconhecida pelo Pillow;
+- janela aberta maximizada para manter as ações principais visíveis;
 - tabela com ordem, nome, tipo e tamanho dos arquivos;
 - prevenção de arquivos duplicados;
 - reordenação com **Subir** e **Descer**;
@@ -34,6 +36,20 @@ O fluxo evita etapas desnecessárias: você adiciona os documentos, confere a or
 - validação visual quando PDFs são usados com saída PNG/JPEG;
 - nomes previsíveis para arquivos convertidos;
 - JPEG salvo com qualidade alta e PNG otimizado.
+
+## Arquivos com extensão numérica
+
+Alguns sistemas salvam imagens com nomes como:
+
+```text
+foto.001
+foto.002
+pagina.010
+```
+
+O conversor não depende da extensão para abrir esses arquivos como imagem. Eles podem ser selecionados normalmente e o Pillow identifica o formato pelo conteúdo real do arquivo.
+
+Assim, uma imagem JPEG chamada `foto.002`, por exemplo, pode ser convertida para PNG, JPEG ou incluída em um PDF normalmente.
 
 ## Fluxo de uso
 
@@ -75,7 +91,7 @@ A ordem exibida na tabela é a ordem usada no documento final.
 ```text
 1. capa.jpg
 2. contrato.pdf
-3. comprovante.png
+3. comprovante.001
 4. anexos.pdf
 ```
 
@@ -84,7 +100,7 @@ O PDF final terá:
 ```text
 capa.jpg
 + todas as páginas de contrato.pdf
-+ comprovante.png
++ comprovante.001 (se o conteúdo for uma imagem válida)
 + todas as páginas de anexos.pdf
 ```
 
@@ -104,7 +120,7 @@ Os PDFs existentes são combinados com `pypdf`, sem transformar suas páginas em
 
 - **Python 3.11+**
 - **Tkinter/ttk** — interface gráfica
-- **Pillow** — processamento de imagens
+- **Pillow** — processamento e identificação de imagens
 - **pypdf** — leitura, união e escrita de PDFs
 - **PyInstaller** — geração de executável
 - **unittest** — testes automatizados
@@ -118,6 +134,7 @@ conversor/
 ├── requirements.txt
 ├── tests/
 │   ├── test_file.py
+│   ├── test_image_converter.py
 │   └── test_pdf_converter.py
 └── src/
     ├── application/
