@@ -10,12 +10,12 @@ class TkFileSelector(FileSelector):
             title="Selecione imagens e PDFs",
             filetypes=[
                 (
-                    "Arquivos suportados",
-                    "*.pdf *.png *.jpg *.jpeg *.webp *.bmp *.gif *.tif *.tiff",
+                    "Imagens, PDFs e arquivos numerados",
+                    "*.*",
                 ),
                 ("PDF", "*.pdf"),
                 (
-                    "Imagens",
+                    "Imagens comuns",
                     "*.png *.jpg *.jpeg *.webp *.bmp *.gif *.tif *.tiff",
                 ),
             ],
