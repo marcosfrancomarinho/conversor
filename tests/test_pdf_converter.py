@@ -12,14 +12,15 @@ from src.infrastructure.pypdf_converter import PyPDFConverter
 
 
 class PyPDFConverterTest(unittest.TestCase):
-    def test_combines_images_and_pdf_preserving_order_and_all_pages(self) -> None:
+    def test_combines_numeric_extension_image_and_pdf_preserving_all_pages(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            first_image = os.path.join(directory, "capa.png")
+            first_image = os.path.join(directory, "capa.001")
             middle_pdf = os.path.join(directory, "contrato.pdf")
             last_image = os.path.join(directory, "comprovante.jpg")
             output = os.path.join(directory, "resultado.pdf")
 
-            Image.new("RGB", (100, 100), "white").save(first_image)
+            # O conteúdo é PNG, mesmo que a extensão seja .001.
+            Image.new("RGB", (100, 100), "white").save(first_image, format="PNG")
             Image.new("RGB", (120, 80), "white").save(last_image)
 
             source_writer = PdfWriter()
