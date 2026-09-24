@@ -14,7 +14,7 @@ O fluxo evita etapas desnecessárias: você adiciona os documentos, confere a or
 
 - seleção múltipla de imagens e PDFs;
 - suporte a imagens com extensões não convencionais, como `.001`, `.002`, `.010` etc., desde que o conteúdo seja uma imagem válida reconhecida pelo Pillow;
-- janela aberta maximizada para manter as ações principais visíveis;
+- janela aberta em tamanho normal (860 × 700), com opção de maximizar manualmente;
 - tabela com ordem, nome, tipo e tamanho dos arquivos;
 - prevenção de arquivos duplicados;
 - reordenação com **Subir** e **Descer**;
@@ -213,10 +213,14 @@ Os testes também são executados automaticamente no GitHub Actions para Python 
 ## Gerando executável
 
 ```bash
-pyinstaller --onefile --windowed --icon=icone.ico main.py
+pyinstaller --noconfirm main.spec
 ```
 
-O executável é criado em `dist/`.
+O executável é criado em `dist/Conversor PDF e Imagens.exe`.
+
+Para fixar na barra de tarefas do Windows, abra esse executável, clique com o
+botão direito no ícone dele na barra e selecione **Fixar na barra de tarefas**.
+Mantenha o executável no mesmo local depois de fixá-lo.
 
 ## Licença
 

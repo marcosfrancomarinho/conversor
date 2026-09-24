@@ -17,7 +17,7 @@ def resource_path(filename: str) -> str:
 
 
 def maximize_window(root: tk.Tk) -> None:
-    """Abre a aplicação maximizada, com fallback para quase toda a tela."""
+    """Abre a aplicação maximizada, com fallback para quase toda a telona."""
     root.update_idletasks()
 
     try:
@@ -39,6 +39,14 @@ def maximize_window(root: tk.Tk) -> None:
 
 
 def main() -> None:
+    if sys.platform == "win32":
+        import ctypes
+
+        set_app_id = ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID
+        set_app_id.argtypes = [ctypes.c_wchar_p]
+        set_app_id.restype = ctypes.c_long
+        set_app_id("MarcosMarinho.ConversorPDFImagens")
+
     root = tk.Tk()
 
     try:
@@ -64,7 +72,6 @@ def main() -> None:
         save_location_selector=save_location_selector,
     )
 
-    root.after_idle(lambda: maximize_window(root))
     root.mainloop()
 
 

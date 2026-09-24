@@ -55,7 +55,7 @@ class ConverterApp:
 
     def __create_interface(self) -> None:
         self.__root.title("Conversor PDF & Imagens")
-        self.__root.geometry("860x700")
+        self.__root.geometry("860x800")
         self.__root.minsize(760, 620)
 
         style = ttk.Style(self.__root)
